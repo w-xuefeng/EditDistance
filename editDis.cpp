@@ -27,6 +27,7 @@ matrix editDis(string,string);
 
 void matrixPrint(matrix);
 
+
 string initString(){
 	string temp;	
 	temp.content = (char *)malloc(sizeof(char)*MAX_LENGTH);
@@ -144,11 +145,13 @@ int main(int argc, char const *argv[]){
 
 	printf("\n");
 
+	printf("The Matrix of  %s and %s is :\n", a.content, b.content);
+
 	matrixPrint(Matrix);
 
 	printf("\n");
 
-	printf("The dis is :%d\n", Matrix.content[Matrix.row-1][Matrix.col-1]);
+	printf("The Edite Distance of %s and %s is :%d\n", a.content, b.content, Matrix.content[Matrix.row-1][Matrix.col-1]);
 
 	return 0;
 }

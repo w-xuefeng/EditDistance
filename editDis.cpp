@@ -1,31 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #define MAX_LENGTH 30
 
 typedef struct String{
 	char *content;
-	int length;
+	uint32_t length;
 }string;
 
 typedef struct Matrix{
-	int row;
-	int col;
-	int **content;
-}matrix;
+	uint32_t row;
+	uint32_t col;
+	uint32_t **content;
+	uint32_t **label;
+};
 
 
 void input_string(char*,char*);
 
 string initString();
 
-int min(int,int);
+uint32_t min(uint32_t,uint32_t);
 
-int dis(string, string, int, int);
+uint32_t dis(string, string, uint32_t, uint32_t, Matrix);
 
-matrix editDis(string,string);
+Matrix editDis(string,string);
 
-void matrixPrint(matrix);
+void matrixPruint32_t(Matrix);
 
 
 string initString(){
@@ -46,112 +48,102 @@ void input_string(char* a,char* b){
 }
 
 
-int min(int a,int b){
+uint32_t min(uint32_t a,uint32_t b){
 	return a <= b ? a : b;
 }
 
-int dis(string a, string b, int i, int j){
-
+uint32_t dis(string a, string b, uint32_t i, uint32_t j, Matrix matrix){
+	
+	if (matrix.label[i][j]==1)
+		return matrix.content[i][j];
+    printf("calculte (%d,%d)\n", i,j);
+	uint32_t distance;
 	if(i == 0){
-
-		return j;		
+		distance=j;
 
 	}else if(j == 0){
-
-		return i;
-
-	}else if(i == 1 && j==1){
-
-		return (a.content[i] == b.content[j]? 0 : 1);
-
+		distance=i;
 	}else{
-		
-		return 	min(
+		distance=min(
 					min(
-						dis(a, b, i-1, j-1) + (a.content[i] == b.content[j] ? 0 : 1),
-						dis(a, b, i, j-1) + 1
-						),
-					dis(a, b, i-1, j) + 1
+						dis(a, b, i-1, j-1,matrix) + (a.content[i-1] == b.content[j-1] ? 0 : 1),
+						dis(a, b, i, j-1,matrix) + 1
+					   ),
+					dis(a, b, i-1, j,matrix) + 1
 				);		
 
 	}
-
+	matrix.content[i][j]=distance;
+	matrix.label[i][j]=1;
+	return distance;
 }
 
 
 
-matrix editDis(string a,string b){
+Matrix editDis(string a,string b){
 
-	matrix Matrix;
+	Matrix matrix;
 
-	int i,j;
+	uint32_t i,j;
 	
-	Matrix.row = a.length + 1;
-	Matrix.col = b.length + 1;
+	matrix.row = a.length+1; // [0, a.length] [0,matrix.row)
+	matrix.col = b.length+1;
 
-	Matrix.content = (int **)malloc(sizeof(int)*Matrix.row);
+	matrix.content = (uint32_t **)malloc( sizeof(uint32_t*) * matrix.row);
+	matrix.label   = (uint32_t **)malloc( sizeof(uint32_t*) * matrix.row);
 
-	for (i = 0; i <= Matrix.col; ++i){
-
-		Matrix.content[i] = (int *)malloc(sizeof(int)*Matrix.col);
-
+	for (i = 0; i < matrix.row; ++i){
+		matrix.content[i] = (uint32_t *) malloc( sizeof(uint32_t) * matrix.col);
+		matrix.label[i] = (uint32_t *) calloc(  matrix.col, sizeof(uint32_t));
 	}	
 
+	uint32_t distance= dis(a,b, matrix.row-1, matrix.col-1, matrix);
+	printf("distance is %d", distance);
 
-	for (i = 0; i < Matrix.row; i++){
-
-		for (j = 0; j < Matrix.col; j++){
-			
-			Matrix.content[i][j] = dis(a,b,i,j);
-
-		}
-
-	}
-
-	return Matrix;
+	return matrix;
 
 }
 
-void matrixPrint(matrix Matrix){
+void matrixPruint32_t(Matrix matrix){
 
-	for (int i = 0; i < Matrix.row; i++){
-
-		for (int j = 0; j < Matrix.col; j++){
-			
-			printf("%d\t",Matrix.content[i][j]);	
-
+	for (uint32_t i = 0; i < matrix.row; i++){
+		for (uint32_t j = 0; j < matrix.col; j++){
+			printf("%d\t",matrix.content[i][j]);	
 		}
-
 		printf("\n");
-
 	}
-
 }
 
-int main(int argc, char const *argv[]){
+int main(uint32_t argc, char const *argv[]){
 
 	string a = initString();
 	string b = initString();	
 
-	matrix Matrix;
+	Matrix matrix;
 
 	input_string(a.content,b.content);
 
 	a.length = strlen(a.content);
 	b.length = strlen(b.content);
 
-
-	Matrix =  editDis(a,b);
+	matrix =  editDis(a,b);
 
 	printf("\n");
 
 	printf("The Matrix of  %s and %s is :\n", a.content, b.content);
 
-	matrixPrint(Matrix);
+	matrixPruint32_t(matrix);
 
 	printf("\n");
 
-	printf("The Edite Distance of %s and %s is :%d\n", a.content, b.content, Matrix.content[Matrix.row-1][Matrix.col-1]);
+	printf("The Edite Distance of %s and %s is :%d\n", a.content, b.content, matrix.content[matrix.row-1][matrix.col-1]);
 
+	free(a.content);
+	free(b.content);
+	uint32_t i,j;
+	for (i = 0; i < matrix.row; i++){
+		free(matrix.content[i]);	
+	}
+	free(matrix.content);
 	return 0;
 }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#define MAX_LENGTH 30
+#define MAX_LENGTH 3000
 
 typedef struct String{
 	char *content;
@@ -27,7 +27,7 @@ uint32_t dis(string, string, uint32_t, uint32_t, Matrix);
 
 Matrix editDis(string,string);
 
-void matrixPruint32_t(Matrix);
+void MatrixPrint(Matrix);
 
 
 string initString(){
@@ -104,7 +104,7 @@ Matrix editDis(string a,string b){
 
 }
 
-void matrixPruint32_t(Matrix matrix){
+void MatrixPrint(Matrix matrix){
 
 	for (uint32_t i = 0; i < matrix.row; i++){
 		for (uint32_t j = 0; j < matrix.col; j++){
@@ -132,7 +132,7 @@ int main(uint32_t argc, char const *argv[]){
 
 	printf("The Matrix of  %s and %s is :\n", a.content, b.content);
 
-	matrixPruint32_t(matrix);
+	MatrixPrint(matrix);
 
 	printf("\n");
 
@@ -143,6 +143,7 @@ int main(uint32_t argc, char const *argv[]){
 	uint32_t i,j;
 	for (i = 0; i < matrix.row; i++){
 		free(matrix.content[i]);	
+		free(matrix.label[i]);	
 	}
 	free(matrix.content);
 	return 0;
